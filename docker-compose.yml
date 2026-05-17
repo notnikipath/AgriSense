@@ -1,0 +1,190 @@
+﻿services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: agrisense-api-gateway
+    env_file: .env
+    ports:
+      - "8580:8400"
+    depends_on:
+      - iot-service
+      - field-service
+      - analysis-service
+      - planning-service
+      - analytics-service
+      - integration-service
+      - notification-service
+    networks: [agrisense-net]
+
+  iot-service:
+    build:
+      context: .
+      dockerfile: iot-service/Dockerfile
+    container_name: agrisense-iot
+    env_file: .env
+    ports:
+      - "32000:8401"
+    depends_on:
+      - timescaledb
+      - rabbitmq
+      - mosquitto
+    networks: [agrisense-net]
+
+  field-service:
+    build:
+      context: .
+      dockerfile: field-service/Dockerfile
+    container_name: agrisense-field
+    env_file: .env
+    ports:
+      - "32001:8402"
+    depends_on:
+      - postgis
+      - redis
+    networks: [agrisense-net]
+
+  analysis-service:
+    build:
+      context: .
+      dockerfile: analysis-service/Dockerfile
+    container_name: agrisense-analysis
+    env_file: .env
+    ports:
+      - "32002:8403"
+    depends_on:
+      - postgres
+      - timescaledb
+    networks: [agrisense-net]
+
+  planning-service:
+    build:
+      context: .
+      dockerfile: planning-service/Dockerfile
+    container_name: agrisense-planning
+    env_file: .env
+    ports:
+      - "31013:8404"
+    depends_on:
+      - postgres
+    networks: [agrisense-net]
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
+    container_name: agrisense-analytics
+    env_file: .env
+    ports:
+      - "32003:8405"
+    depends_on:
+      - postgres
+      - timescaledb
+    networks: [agrisense-net]
+
+  integration-service:
+    build:
+      context: .
+      dockerfile: integration-service/Dockerfile
+    container_name: agrisense-integration
+    env_file: .env
+    ports:
+      - "32004:8406"
+    depends_on:
+      - rabbitmq
+      - redis
+    networks: [agrisense-net]
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: agrisense-notification
+    env_file: .env
+    ports:
+      - "32005:8407"
+    depends_on:
+      - rabbitmq
+    networks: [agrisense-net]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: agrisense-frontend
+    env_file: .env
+    ports:
+      - "5184:5177"
+    depends_on:
+      - api-gateway
+    networks: [agrisense-net]
+
+  postgres:
+    image: postgres:16
+    container_name: agrisense-postgres
+    environment:
+      POSTGRES_DB: agrisense
+      POSTGRES_USER: agrisense
+      POSTGRES_PASSWORD: agrisense
+    ports:
+      - "55445:5432"
+    volumes:
+      - agrisense_postgres_data:/var/lib/postgresql/data
+    networks: [agrisense-net]
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: agrisense-timescaledb
+    environment:
+      POSTGRES_DB: agrisense
+      POSTGRES_USER: agrisense
+      POSTGRES_PASSWORD: agrisense
+    ports:
+      - "55446:5432"
+    volumes:
+      - agrisense_timescaledb_data:/var/lib/postgresql/data
+    networks: [agrisense-net]
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: agrisense-postgis
+    environment:
+      POSTGRES_DB: agrisense
+      POSTGRES_USER: agrisense
+      POSTGRES_PASSWORD: agrisense
+    ports:
+      - "32006:5432"
+    volumes:
+      - agrisense_postgis_data:/var/lib/postgresql/data
+    networks: [agrisense-net]
+
+  redis:
+    image: redis:7
+    container_name: agrisense-redis
+    ports:
+      - "6384:6379"
+    networks: [agrisense-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: agrisense-rabbitmq
+    ports:
+      - "30002:5672"
+      - "31012:15672"
+    networks: [agrisense-net]
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: agrisense-mosquitto
+    ports:
+      - "1884:1883"
+    networks: [agrisense-net]
+
+networks:
+  agrisense-net:
+    driver: bridge
+
+volumes:
+  agrisense_postgres_data:
+  agrisense_timescaledb_data:
+  agrisense_postgis_data:
