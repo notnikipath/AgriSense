@@ -52,7 +52,7 @@ AgriSense is a microservice platform for digital farm management: sensor telemet
 ## Local run
 
 ```bash
-cd d:\Шарага\Кинжа3\Task_14_AgriSense
+cd 'your/project/folder'
 docker compose up --build -d
 ```
 
