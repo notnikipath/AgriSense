@@ -1,4 +1,4 @@
-﻿# AgriSense
+# AgriSense
 
 AgriSense is a microservice platform for digital farm management: sensor telemetry, field maps, irrigation and fertilization recommendations, yield forecasting, work planning, and operational analytics.
 
@@ -52,7 +52,7 @@ AgriSense is a microservice platform for digital farm management: sensor telemet
 ## Local run
 
 ```bash
-cd 'your/project/folder'
+cd AgriSense
 docker compose up --build -d
 ```
 

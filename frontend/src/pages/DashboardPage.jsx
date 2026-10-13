@@ -77,7 +77,7 @@ export function DashboardPage() {
       return "loading";
     }
     if (status === "failed") {
-      return "fallback";
+      return "Service unavailable";
     }
     return "live";
   }, [status]);
@@ -106,7 +106,7 @@ export function DashboardPage() {
       <header className="hero">
         <div className="hero-copy">
           <p className="eyebrow">AgriSense Control Center</p>
-          <h1>Precision farming dashboard for monitoring, irrigation, recommendations, and seasonal performance.</h1>
+          <h1>Field operations</h1>
           <p className="sub">
             AgriSense connects IoT sensors, field maps, analytics, and operational planning to keep crop decisions data-driven.
           </p>
@@ -126,12 +126,12 @@ export function DashboardPage() {
             <input value={fieldId} onChange={(event) => setFieldId(event.target.value)} placeholder="FIELD-DEMO-1" />
           </label>
           <div className="hero-actions">
-            <button onClick={refresh}>Refresh dashboard</button>
+            <button onClick={refresh} disabled={status === "loading"}>Refresh dashboard</button>
             <button className="ghost" onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}>
               Theme
             </button>
           </div>
-          <p className="status-line">Status: {statusLabel}</p>
+          <p className="status-line" role="status" aria-live="polite">Status: {statusLabel}</p>
         </div>
       </header>
 
@@ -162,7 +162,7 @@ export function DashboardPage() {
         />
       </section>
 
-      {error ? <div className="error-banner">{error}</div> : null}
+      {error ? <div className="error-banner" role="alert">{error}</div> : null}
 
       <section className="content-grid">
         <article className="panel panel-featured">
